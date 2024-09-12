@@ -29,6 +29,16 @@ class Course:
 
     def get_enrollments(self):
         return self._enrollments.copy()
+    
+    def count_course(self):
+        return len(self._enrollments)
+    
+    def aggregate_average_grade(self):
+      # lets assume the grades are stored in a protected attribute called _grades. 
+      total_grades = sum(self._grades.values())
+      num_courses = len(self._grades)
+      average_grade = total_grades / num_courses
+      return average_grade
 
 
 class Enrollment:
@@ -45,3 +55,30 @@ class Enrollment:
 
     def get_enrollment_date(self):
         return self._enrollment_date
+
+    @classmethod
+    ##In this method we iterate through all the enrollments
+    # and create a Dictionary where the key is the date and the value is the count
+    # of enrollments on that date. We increment the count 
+    # every time we see an enrollment on the same date.
+    def aggregate_enrollments_per_day(cls):
+        enrollment_count = {}
+        for enrollment in cls.all:
+            date = enrollment.get_enrollment_date().date()
+            enrollment_count[date] = enrollment_count.get(date, 0) + 1
+        return enrollment_count
+    
+##TESTS
+if __name__ == "__main__":
+    s1 = Student("John")
+    c1 = Course("Programming")
+    c2 = Course("Math")
+    s1.enroll(c1)
+    s1.enroll(c2)
+    
+    enrollment_count = Enrollment.aggregate_enrollments_per_day()
+    for date, count in enrollment_count.items():
+        print("At {0} there were {1} enrollments".format(date, count))
+    
+    print(c1.count_course())
+    print(c2.count_course())
